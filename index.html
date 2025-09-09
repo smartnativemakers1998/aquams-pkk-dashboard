@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Air Quality Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f6f9;
+    }
+    header {
+      background: #004d99;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    .metrics {
+      display: flex;
+      justify-content: space-around;
+      margin: 40px 20px;
+      flex-wrap: wrap;
+    }
+    .metric-card {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 180px;
+      margin: 10px;
+    }
+    .metric-card h2 {
+      margin: 0;
+      font-size: 28px;
+      color: #004d99;
+    }
+    .metric-card p {
+      margin: 10px 0 0;
+      font-size: 16px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Air Quality Monitoring Dashboard</h1>
+</header>
+
+<div class="metrics">
+  <div class="metric-card">
+    <h2 id="temp">--</h2>
+    <p>Temperature (°C)</p>
+  </div>
+  <div class="metric-card">
+    <h2 id="humidity">--</h2>
+    <p>Humidity (%)</p>
+  </div>
+  <div class="metric-card">
+    <h2 id="so2">--</h2>
+    <p>SO₂ (ppm)</p>
+  </div>
+  <div class="metric-card">
+    <h2 id="no2">--</h2>
+    <p>NO₂ (ppm)</p>
+  </div>
+  <div class="metric-card">
+    <h2 id="pm25">--</h2>
+    <p>PM2.5 (µg/m³)</p>
+  </div>
+</div>
+
+<script>
+  const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTzX2OChImTBy0oPpceySRP4s4Wk439_njRjhuRFZD1CKgUsHghMYLHJ62VWiqREDWKMNAewGcxKC-e/pub?output=csv";
+
+  function updateDashboard() {
+    fetch(sheetURL)
+      .then(response => response.text())
+      .then(data => {
+        const rows = data.split("\n").map(r => r.split(","));
+        const headers = rows[0].map(h => h.trim());
+
+        const tempIndex = headers.indexOf("Temp");
+        const humIndex = headers.indexOf("Humidity");
+        const so2Index = headers.indexOf("SO2");
+        const no2Index = headers.indexOf("NO2");
+        const pm25Index = headers.indexOf("PM2.5");
+
+        const latest = rows[rows.length - 1]; // last row
+
+        document.getElementById("temp").textContent = latest[tempIndex] + "°C";
+        document.getElementById("humidity").textContent = latest[humIndex] + "%";
+        document.getElementById("so2").textContent = latest[so2Index];
+        document.getElementById("no2").textContent = latest[no2Index];
+        document.getElementById("pm25").textContent = latest[pm25Index];
+      });
+  }
+
+  updateDashboard();
+  setInterval(updateDashboard, 60000); // auto-refresh every 60 sec
+</script>
+
+</body>
+</html>
